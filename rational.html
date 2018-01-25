@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+  <title>Rational Walk</title>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+</head>
+
+<style>
+path {
+	fill: none;
+	stroke: #999;
+}
+
+@font-face {
+    font-family: "JamesFajardo";
+    src: url(JamesFajardo.ttf) format("truetype");
+}
+
+body {
+  margin: 0;
+  font-family: Optima;
+  text-align: center;
+  font-size: 32;
+}
+p {
+  text-align: left;
+  font-family: Optima;
+  padding-left: 250px;
+  padding-right: 250px;
+}
+
+.topnav {
+  opacity: 0.5;
+  overflow: hidden;
+  background-color: white;
+}
+
+.topnav .menu {
+  float: right;
+  color: black;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+  background-color: #ddd;
+  color: black;
+}
+</style>
+
+<body>
+<div class="header" id="myHeader">
+<div class="topnav">
+
+</a>
+  <a class="menu" href="e_vis.html">Walking Through "e"</a>
+  <a class="menu" href="index.html">Walking Through Rationals</a>
+</div>
+
+<h1 style="font-size:36px">Walking through Rational Numbers</h1>
+<h4 style="opacity: 0.5">Select rational number to visualize a pattern with the first 100 decimal digits</h4>
+
+<p>When walking through rational numbers, they produce amazing patterns when visualized. Sometimes cycles are produced, but usually rational numbers produce a pattern that goes on forever in one direction. Use the selector to play around with some of the rational numbers.</p>
+<br>
+<select id="selector"></select>
+  <script>
+
+// this is 1/7's decimals
+var rat = "142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857142857"
+
+// this is 19645/99999
+var rat2 = "19645196451964519645196451964519645196451964519645196451964519645196451964519645196451964519645196451964519645196451964519645196451964519645196451964519645196451964519645196451964519645196451964519645196451964519645196451964519645"
+
+var rat3 = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+
+var rat4 = "500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+
+
+var svgContainer = d3.select("body").append("svg")
+    .attr("width", 1500)
+    .attr("height", 800);
+
+var points = [
+// dig, x, y
+	[0, 1, 0, "red"],
+	[1, .809, .588, "blue"],
+	[2, .309, .951, "purple"],
+	[3, -.309, .951, "violet"],
+	[4, -.809, .588, "orange"],
+	[5, -1, 0, "cyan"],
+	[6, -.809, -.588, "lightblue"],
+	[7, -.309, -.951, "green"],
+	[8, .309, -.951, "teal"],
+	[9, .809, -.588, "pink"]
+];
+  var line = svgContainer.append("line");
+  var selector = d3.select("#selector");
+
+  var num_e = ["1/2", "1/7", "19645/99999", "137174210/1111111111"];
+  var len = 100;
+  var curr = rat4;
+
+
+  selector
+    .selectAll("option")
+    .data(num_e)
+    .enter()
+    .append("option")
+      .text(function(d){ return d; })
+      .attr("value", function(d){ return d; });
+
+  selector
+    .on("change", function(){
+        d3.selectAll("path")
+          .attr("opacity", 1.0);
+        var value = selector.property("value");
+        console.log(value);
+        if(value == "1/7"){
+        	// len = 100;
+        	d3.selectAll("line").remove();
+        	d3.selectAll("circle").remove();
+          d3.selectAll("text").remove();
+          curr = rat;
+        	reDraw();
+        } else if(value == "19645/99999"){
+        	// len = 1000;
+        	d3.selectAll("line").remove();
+        	d3.selectAll("circle").remove();
+          d3.selectAll("text").remove();
+          curr = rat2;
+        	reDraw();
+        } else if(value == "137174210/1111111111"){
+        	// len = 10000;
+          d3.selectAll("line").remove();
+          d3.selectAll("circle").remove();
+          d3.selectAll("text").remove();
+          curr = rat3;
+          reDraw();
+        } else if(value == "1/2"){
+          // len = 10000;
+          d3.selectAll("line").remove();
+          d3.selectAll("circle").remove();
+          d3.selectAll("text").remove();
+          curr = rat4;
+          reDraw();
+        }
+
+    });
+
+
+
+
+function reDraw(){
+	for(i = 0; i < 10; i ++){
+		var legend = svgContainer.append("line")
+		    .attr("x1", 500)
+		    .attr("y1", 50)
+		    .attr("x2", 500 + (points[i][1] * 30))
+		    .attr("y2", 50 + (points[i][2] * 30))
+		    .attr("stroke-width", 2)
+			.attr("stroke", points[i][3])
+			.text("I'm a label");
+
+		svgContainer.append("text")
+			.attr("transform", "translate(" + (496.5 + (points[i][1] * 36)) + "," + (50 + (points[i][2] * 36)) + ")")
+			.attr("dy", ".35em")
+			.attr("text-anchor", "start")
+			.style("fill", "black")
+			.text(i);
+	}
+	svgContainer.append("text")
+		.attr("transform", "translate(" + 500 + "," + 100 + ")")
+		.attr("dy", ".35em")
+		.attr("text-anchor", "middle")
+		.style("fill", "black")
+		.text("Number Legend");
+	
+  var rationalText = svgContainer.append("text")
+    .attr("transform", "translate(" + 700 + "," + 500 + ")")
+    .attr("dy", ".35em")
+    .attr("text-anchor", "middle")
+    .style("fill", "black")
+    .text("0." + curr.substring(0, 10) + "...");
+
+	var prev = {
+	    x: 900,
+	    y: 200
+	  };
+
+	var start = {
+		x: 900,
+		y: 200
+	};
+
+	var l = 40;
+	if(curr == rat){
+    l = 40;
+		start.x = 900;
+		start.y = 200;
+		prev.x = 900;
+		prev.y = 200;
+	} else if(curr == rat2){
+    l = 40;
+		start.x = 1120;
+		start.y = 350;
+		prev.x = 1120;
+		prev.y = 350;
+	} else if(curr == rat3){
+    l = 60;
+		start.x = 720;
+		start.y = 200;
+		prev.x = 720;
+		prev.y = 200;
+	} else if(curr == rat4){
+    l = 10;
+    start.x = 200;
+    start.y = 300;
+    prev.x = 200;
+    prev.y = 300;
+	}
+	for(i = 0; i < len; i ++){
+		var c_to_i = parseInt(curr[i]);
+		line = svgContainer.append("line")
+		    .attr("x1", prev.x)
+		    .attr("y1", prev.y)
+		    .attr("x2", function(){prev.x = prev.x + (points[c_to_i][1] * l); return prev.x;})
+		    .attr("y2", function(){prev.y = prev.y + (points[c_to_i][2] * l); return prev.y;})
+		    .attr("stroke-width", 1)
+			.attr("stroke", points[c_to_i][3])
+			// .transition()
+			//     .duration(500)
+			    // .ease(d3.easeLinear);
+		// console.log(prev.x, prev.y)
+	}
+  // console.log(rat.length);
+	var tooltip = d3.select("body")
+		.append("div")
+		.style("position", "absolute")
+		.style("z-index", "10")
+		.style("visibility", "hidden");
+
+	var start = svgContainer.append("circle")
+		.attr("class", "start")
+		.attr("cx", start.x)
+		.attr("cy", start.y)
+		.attr("r", 5)
+		.style("fill", "darkgreen")
+		.on("mouseover", function(d){
+			d3.select(this)
+				.attr("stroke-width", 5)
+				.attr("stroke", "white")
+				.attr("opacity", 1);
+			tooltip
+				.text("start")
+				.attr("stroke-width", 5+"px")
+				.style("visibility", "visible");
+		})
+		.on("mousemove", function(){
+			tooltip
+				.style("top", (event.pageY-10)+"px")	
+				.style("left",(event.pageX+10)+"px")
+				.attr("class", "shadow");
+		})
+		.on("mouseout", function(){	
+			d3.select(this)
+				.attr("stroke-width", 0)
+				.attr("stroke", "black");
+			return tooltip.style("visibility", "hidden");
+		});
+
+	var end = svgContainer.append("circle")
+		.attr("class", "end")
+		.attr("cx", prev.x)
+		.attr("cy", prev.y)
+		.attr("r", 5)
+		.style("fill", "darkred")
+		.on("mouseover", function(d){
+			d3.select(this)
+				.attr("stroke-width", 5)
+				.attr("stroke", "white")
+				.attr("opacity", 1);
+			tooltip
+				.text("end")
+				.attr("stroke-width", 5+"px")
+				.style("visibility", "visible");
+		})
+		.on("mousemove", function(){
+			tooltip
+				.style("top", (event.pageY-10)+"px")	
+				.style("left",(event.pageX+10)+"px")
+				.attr("class", "shadow");
+		})
+		.on("mouseout", function(){	
+			d3.select(this)
+				.attr("stroke-width", 0)
+				.attr("stroke", "black");
+			return tooltip.style("visibility", "hidden");
+		});
+
+}
+reDraw();
+  </script>
+<!-- 
+       <p style="font-size:18px">Irrational numbers have decimals that go on infinitely and do not terminate. Irrational numbers also are non-periodic. For example, 1/3 is 0.33333.. and keeps on going, hence periodic. 1/7 is also periodic, which is 0.142857142857142857142857, which is actually "142867" repeating itself in the decimals. When walking through rational numbers, they produce amazing patterns when visualized. However, when walking through irrational numbers, the designs get random. Above is the visualization when walking through the digits of <i>e</i>, which is really random, even when you increase the significant digits.</p> -->
+</body>
+</html>
